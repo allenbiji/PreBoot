@@ -1,0 +1,28 @@
+package cli
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+func RootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "sage",
+		Short: "Clonesage handles local setup diagnostics",
+		Long:  "An open-source CLI for diagnosing local development setup failures in repositories.",
+	}
+
+	rootCmd.AddCommand(NewCheckCmd())
+	rootCmd.AddCommand(NewInitCmd())
+
+	return rootCmd
+}
+
+func Execute() {
+	if err := RootCmd().Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
