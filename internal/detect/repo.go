@@ -7,6 +7,7 @@ func ScanRepo() []model.CheckConfig {
 
 	checks = append(checks, detectGo()...)
 	checks = append(checks, detectEnv()...)
+	checks = append(checks, detectDockerCompose()...)
 
 	if fileExists("Makefile") {
 		checks = append(checks, model.CheckConfig{

@@ -10,7 +10,7 @@ import (
 // looks for the filename to verify that it exists
 func fileExists(filePath string) bool {
 	file, err := os.Stat(filePath)
-	if err != nil {
+	if os.IsNotExist(err) {
 		fmt.Println("There file is not accessible", err)
 	}
 

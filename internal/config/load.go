@@ -10,7 +10,7 @@ import (
 func Load() (*model.ClonesageConfig, error) {
 	v := viper.New()
 
-	v.SetConfigFile("sage-auto.yaml")
+	v.SetConfigFile("sage-auto.yml")
 
 	err := v.ReadInConfig()
 	if err != nil {
@@ -19,7 +19,7 @@ func Load() (*model.ClonesageConfig, error) {
 		}
 	}
 
-	v.SetConfigFile("sage.yaml")
+	v.SetConfigFile("sage.yml")
 	if err := v.MergeInConfig(); err != nil {
 		return nil, fmt.Errorf("Error merging config files: %w", err)
 	}

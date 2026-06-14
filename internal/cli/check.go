@@ -12,14 +12,14 @@ func NewCheckCmd() *cobra.Command {
 
 	checkCmd := &cobra.Command{
 		Use:   "check",
-		Short: "Check the sage.yaml file for any errors",
+		Short: "Check the sage.yml file for any errors",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Printf("Check command invoked with configs, %s and %v", cfgFile, isQuickMode)
 			return nil
 		},
 	}
 
-	checkCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "Path to custom sage.yaml")
+	checkCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "Path to custom sage.yml")
 	checkCmd.Flags().BoolVarP(&isQuickMode, "quick", "q", false, "Run only fast, low-cost checks")
 
 	return checkCmd
