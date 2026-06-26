@@ -18,9 +18,9 @@ func generateEnvChecks(fileName string) []model.CheckConfig {
 		Fix:      "Run cp " + fileName + " .env",
 	})
 
-	keys := extractEnvKeys(fileName)
+	keys, _ := ExtractEnvKeys(fileName)
 
-	for _, key := range keys {
+	for key := range keys {
 		checks = append(checks, model.CheckConfig{
 			Name:     strings.ToLower(key) + "-configured",
 			Type:     model.TypeEnvExists,
