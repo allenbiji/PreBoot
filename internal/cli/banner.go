@@ -2,13 +2,19 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/mattn/go-isatty"
 )
 
 func printBanner() {
+	if !isatty.IsTerminal(os.Stderr.Fd()) {
+		return
+	}
+
 	startColor, _ := colorful.Hex("#225A40")
 	endColor, _ := colorful.Hex("#67E0A8")
 
@@ -39,6 +45,6 @@ func printBanner() {
 			sb.WriteString(style.Render(string(ch)))
 			charIndex++
 		}
-		fmt.Println(sb.String())
+		fmt.Fprintln(os.Stderr, sb.String())
 	}
 }

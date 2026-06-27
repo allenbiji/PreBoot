@@ -16,11 +16,14 @@ type DirectoryCheck struct {
 //execute method for the check
 func (d* DirectoryCheck) Execute() error {
 	info, err := os.Stat(d.Folder)
-	if os.IsNotExist(err){
+	if os.IsNotExist(err) {
 		return fmt.Errorf("The folder %s does not exist", d.Folder)
 	}
+	if err != nil {
+		return fmt.Errorf("error accessing directory %s: %w", d.Folder, err)
+	}
 
-	if !info.IsDir(){
+	if !info.IsDir() {
 		return fmt.Errorf("Expected a directory %s, but detected a file", d.Folder)
 	}
 

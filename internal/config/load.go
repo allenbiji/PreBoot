@@ -19,6 +19,13 @@ func Load() (*model.ClonesageConfig, error) {
 		return nil, fmt.Errorf("No config files found. Run 'sage init' to generate config files")
 	}
 
+	if errAuto != nil && !errors.Is(errAuto, fs.ErrNotExist) {
+		return nil, errAuto
+	}
+	if errExplicit != nil && !errors.Is(errExplicit, fs.ErrNotExist) {
+		return nil, errExplicit
+	}
+
 	var finalCfg *model.ClonesageConfig
 	if explicitCfg == nil {
 		fmt.Fprintln(os.Stderr, "Using auto-generated config (no sage.yml found).")

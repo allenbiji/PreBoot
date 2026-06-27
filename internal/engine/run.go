@@ -25,7 +25,7 @@ var ErrCheckFailed = errors.New("one or more blocker checks failed")
 // Run executes the diagnostics. It returns nil if the environment is healthy,
 // or ErrCheckFailed if a blocker check failed.
 func Run(cfg *model.ClonesageConfig, quickMode bool) error {
-	fmt.Println(colorize(Cyan, "Running CloneSage Diagnostics...\n"))
+	fmt.Fprintln(os.Stderr, colorize(Cyan, "Running CloneSage Diagnostics..."))
 
 	hasBlockerFailed := false
 	passedCount := 0

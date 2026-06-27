@@ -154,6 +154,30 @@ checks:
 	}
 }
 
+func TestLoad_AutoParseError_SageMissing(t *testing.T) {
+	dir := t.TempDir()
+	chdir(t, dir)
+	if err := os.WriteFile(filepath.Join(dir, "sage-auto.yml"), []byte(":::bad yaml:::\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Load()
+	if err == nil {
+		t.Fatal("expected error when sage-auto.yml fails to parse, got nil")
+	}
+}
+
+func TestLoad_SageParseError_AutoMissing(t *testing.T) {
+	dir := t.TempDir()
+	chdir(t, dir)
+	if err := os.WriteFile(filepath.Join(dir, "sage.yml"), []byte(":::bad yaml:::\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Load()
+	if err == nil {
+		t.Fatal("expected error when sage.yml fails to parse, got nil")
+	}
+}
+
 func TestLoad_InvalidVersionRejects(t *testing.T) {
 	dir := t.TempDir()
 	chdir(t, dir)
