@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/allenbiji/clone-sage/internal/model"
@@ -107,6 +108,29 @@ func TestBuildEnvExistsCheck(t *testing.T) {
 		if err := check.Execute(); err != nil {
 			t.Errorf("Execute() error: %v", err)
 		}
+	})
+
+	t.Run("concurrent cache access", func(t *testing.T) {
+		tmp := t.TempDir()
+		if err := os.Chdir(tmp); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { os.Chdir(origDir); cachedEnvMap = nil })
+
+		if err := os.WriteFile(filepath.Join(tmp, ".env"), []byte("DB=localhost\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		const goroutines = 20
+		var wg sync.WaitGroup
+		wg.Add(goroutines)
+		for range goroutines {
+			go func() {
+				defer wg.Done()
+				_, _ = buildEnvExistsCheck(model.CheckConfig{Options: map[string]string{"key": "DB"}})
+			}()
+		}
+		wg.Wait()
 	})
 
 	t.Run("cache reuse", func(t *testing.T) {

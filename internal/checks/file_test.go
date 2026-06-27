@@ -20,6 +20,10 @@ func TestBuildFileCheck(t *testing.T) {
 		{"no options", nil, "requires a 'path' option"},
 		{"empty path", map[string]string{"path": ""}, "requires a 'path' option"},
 		{"valid path", map[string]string{"path": "x"}, ""},
+		{"absolute path", map[string]string{"path": "/etc/passwd"}, "must be a relative path"},
+		{"tilde path", map[string]string{"path": "~/config"}, "must not be a home-directory"},
+		{"parent traversal", map[string]string{"path": "../../etc/hosts"}, "must not traverse parent"},
+		{"nested valid path", map[string]string{"path": "sub/dir/file.txt"}, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

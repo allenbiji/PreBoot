@@ -18,6 +18,8 @@ func TestBuildCommandExistsCheck(t *testing.T) {
 		{"no options", nil, "requires"},
 		{"empty command", map[string]string{"command": ""}, "requires"},
 		{"valid command", map[string]string{"command": "go"}, ""},
+		{"path with slash", map[string]string{"command": "/usr/bin/go"}, "must be a bare name"},
+		{"path with backslash", map[string]string{"command": "go\\env"}, "must be a bare name"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -39,6 +39,31 @@ func TestBuildHttpReachableCheck(t *testing.T) {
 			opts:        map[string]string{"address": "http://x", "timeout_ms": "bad"},
 			wantTimeout: 5 * time.Second,
 		},
+		{
+			name:    "no scheme",
+			opts:    map[string]string{"address": "localhost:8080"},
+			wantErr: "must use http or https",
+		},
+		{
+			name:    "ftp scheme",
+			opts:    map[string]string{"address": "ftp://host.example.com"},
+			wantErr: "must use http or https",
+		},
+		{
+			name:    "file scheme",
+			opts:    map[string]string{"address": "file:///etc/passwd"},
+			wantErr: "must use http or https",
+		},
+		{
+			name:    "no host",
+			opts:    map[string]string{"address": "http://"},
+			wantErr: "has no host",
+		},
+		{
+			name:        "valid https",
+			opts:        map[string]string{"address": "https://x"},
+			wantTimeout: 5 * time.Second,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

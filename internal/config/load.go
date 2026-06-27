@@ -34,7 +34,7 @@ func Load() (*model.ClonesageConfig, error) {
 	MergeDefaults(finalCfg)
 
 	if err := ValidateConfig(finalCfg); err != nil {
-		return nil, fmt.Errorf("There was an error in validating the yaml configs: %w", err)
+		return nil, err
 	}
 
 	return finalCfg, nil
@@ -67,11 +67,8 @@ func readConfigFile(filename string) (*model.ClonesageConfig, error) {
 
 	v.SetConfigFile(filename)
 
-	err := v.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, fmt.Errorf("Error reading config file: %w", err)
-		}
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
 	var cfg model.ClonesageConfig

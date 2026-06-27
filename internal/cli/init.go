@@ -20,9 +20,9 @@ func NewInitCmd() *cobra.Command {
 			cfgs := detect.ScanRepo()
 
 			if len(cfgs.Checks) == 0 {
-				fmt.Println("No recognised frameworks found. Generating empty baseline.")
+				fmt.Fprintln(os.Stderr, "No recognised frameworks found. Generating empty baseline.")
 			} else {
-				fmt.Printf("Detected %d requirements. Building configuration...\n", len(cfgs.Checks))
+				fmt.Fprintf(os.Stderr, "Detected %d requirements. Building configuration...\n", len(cfgs.Checks))
 			}
 
 			// Marshal the struct cleanly into YAML bytes

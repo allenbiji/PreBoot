@@ -20,6 +20,12 @@ func TestBuildPortFreeCheck(t *testing.T) {
 		{"no options", nil, "requires a 'port' option"},
 		{"empty port", map[string]string{"port": ""}, "requires a 'port' option"},
 		{"valid port", map[string]string{"port": "9000"}, ""},
+		{"non-numeric", map[string]string{"port": "abc"}, "not a valid number"},
+		{"port zero", map[string]string{"port": "0"}, "out of range"},
+		{"port 65536", map[string]string{"port": "65536"}, "out of range"},
+		{"negative port", map[string]string{"port": "-1"}, "out of range"},
+		{"port min valid", map[string]string{"port": "1"}, ""},
+		{"port max valid", map[string]string{"port": "65535"}, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

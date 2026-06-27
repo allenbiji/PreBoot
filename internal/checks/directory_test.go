@@ -20,6 +20,9 @@ func TestBuildDirectoryExistsCheck(t *testing.T) {
 		{"no options", nil, "requires a 'folder' option"},
 		{"empty folder", map[string]string{"folder": ""}, "requires a 'folder' option"},
 		{"valid folder", map[string]string{"folder": "x"}, ""},
+		{"absolute path", map[string]string{"folder": "/tmp"}, "must be a relative path"},
+		{"tilde path", map[string]string{"folder": "~/projects"}, "must not be a home-directory"},
+		{"parent traversal", map[string]string{"folder": "../outside"}, "must not traverse parent"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
