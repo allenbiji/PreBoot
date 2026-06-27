@@ -3,6 +3,7 @@ package checks
 import (
 	"fmt"
 	"net"
+	"strconv"
 
 	"github.com/allenbiji/clone-sage/internal/model"
 	"github.com/allenbiji/clone-sage/internal/registry"
@@ -14,13 +15,24 @@ type PortFreeCheck struct {
 
 //execute method for the port free check
 func (p *PortFreeCheck) Execute() error {
-	listen, err := net.Listen("tcp", ":" + p.Port)
+	listen, err := net.Listen("tcp", "127.0.0.1:"+p.Port)
 	if err != nil {
-		return fmt.Errorf("The port '%s' is  not free", p.Port)
+		return fmt.Errorf("port %s is not free", p.Port)
 	}
 
 	defer listen.Close()
 
+	return nil
+}
+
+func validatePort(portStr string) error {
+	n, err := strconv.Atoi(portStr)
+	if err != nil {
+		return fmt.Errorf("port %q is not a valid number: %w", portStr, err)
+	}
+	if n < 1 || n > 65535 {
+		return fmt.Errorf("port %d is out of range (must be 1–65535)", n)
+	}
 	return nil
 }
 
@@ -30,7 +42,9 @@ func buildPortFreeCheck(cfg model.CheckConfig) (registry.Check, error) {
 	if !ok || port == "" {
 		return nil, fmt.Errorf("The port_free check requires a 'port' option")
 	}
-
+	if err := validatePort(port); err != nil {
+		return nil, err
+	}
 	return &PortFreeCheck{
 		Port: port,
 	}, nil

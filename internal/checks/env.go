@@ -2,6 +2,7 @@ package checks
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/allenbiji/clone-sage/internal/detect"
 	"github.com/allenbiji/clone-sage/internal/model"
@@ -25,8 +26,11 @@ func (e *EnvCheck) Execute() error {
 }
 
 // cachedEnvMap holds the parsed .env contents for the lifetime of the process.
-// The factory populates it on first call; all subsequent env_exists checks reuse it.
-var cachedEnvMap map[string]string
+// cachedEnvMutex guards both the nil check and the write so concurrent callers are safe.
+var (
+	cachedEnvMap   map[string]string
+	cachedEnvMutex sync.Mutex
+)
 
 func buildEnvExistsCheck(cfg model.CheckConfig) (registry.Check, error) {
 	key, ok := cfg.Options["key"]
@@ -34,13 +38,16 @@ func buildEnvExistsCheck(cfg model.CheckConfig) (registry.Check, error) {
 		return nil, fmt.Errorf("env_exists check requires a 'key' option")
 	}
 
+	cachedEnvMutex.Lock()
 	if cachedEnvMap == nil {
 		m, err := detect.ExtractEnvKeys(".env")
 		if err != nil {
+			cachedEnvMutex.Unlock()
 			return nil, fmt.Errorf("could not read .env: %w", err)
 		}
 		cachedEnvMap = m
 	}
+	cachedEnvMutex.Unlock()
 
 	return &EnvCheck{Key: key, EnvMap: cachedEnvMap}, nil
 }

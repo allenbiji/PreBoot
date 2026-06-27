@@ -2,7 +2,9 @@ package checks
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -25,7 +27,10 @@ func (h *HttpReachableCheck) Execute() error {
 		return fmt.Errorf("http address %q is not reachable: %w", h.Address, err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("http address %q returned unhealthy status code: %d", h.Address, resp.StatusCode)
@@ -34,10 +39,27 @@ func (h *HttpReachableCheck) Execute() error {
 	return nil
 }
 
+func validateHTTPAddress(address string) error {
+	u, err := url.Parse(address)
+	if err != nil {
+		return fmt.Errorf("invalid address %q: %w", address, err)
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return fmt.Errorf("address %q must use http or https scheme, got %q", address, u.Scheme)
+	}
+	if u.Host == "" {
+		return fmt.Errorf("address %q has no host", address)
+	}
+	return nil
+}
+
 func buildHttpReachableCheck(cfg model.CheckConfig) (registry.Check, error) {
 	address, ok := cfg.Options["address"]
 	if !ok || address == "" {
 		return nil, fmt.Errorf("http_reachable check requires an 'address' option")
+	}
+	if err := validateHTTPAddress(address); err != nil {
+		return nil, err
 	}
 
 	timeout := 5 * time.Second

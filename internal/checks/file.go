@@ -3,6 +3,8 @@ package checks
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/allenbiji/clone-sage/internal/model"
 	"github.com/allenbiji/clone-sage/internal/registry"
@@ -30,14 +32,32 @@ func (f *FileCheck) Execute() error {
 	return nil
 }
 
+func validateRelativePath(path, field string) error {
+	if filepath.IsAbs(path) {
+		return fmt.Errorf("%s %q must be a relative path, not an absolute path", field, path)
+	}
+	if strings.HasPrefix(path, "~") {
+		return fmt.Errorf("%s %q must not be a home-directory path", field, path)
+	}
+	for _, part := range strings.Split(filepath.Clean(path), string(filepath.Separator)) {
+		if part == ".." {
+			return fmt.Errorf("%s %q must not traverse parent directories", field, path)
+		}
+	}
+	return nil
+}
+
 //creates file check factory
-func buildFileCheck(cfg model.CheckConfig) (registry.Check, error){
+func buildFileCheck(cfg model.CheckConfig) (registry.Check, error) {
 	path, ok := cfg.Options["path"]
-	if(!ok || path == ""){
+	if !ok || path == "" {
 		return nil, fmt.Errorf("file_exists check requires a 'path' option")
 	}
+	if err := validateRelativePath(path, "path"); err != nil {
+		return nil, err
+	}
 	return &FileCheck{
-		Path: path,
+		Path: filepath.Clean(path),
 	}, nil
 }
 

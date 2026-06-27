@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"os"
-
 	"github.com/allenbiji/clone-sage/internal/config"
 	"github.com/allenbiji/clone-sage/internal/engine"
 	"github.com/spf13/cobra"
@@ -21,11 +19,7 @@ func NewCheckCmd() *cobra.Command {
 				return err
 			}
 
-			success := engine.Run(cfg, isQuickMode)
-			if !success {
-				os.Exit(1)
-			}
-			return nil
+			return engine.Run(cfg, isQuickMode)
 		},
 	}
 

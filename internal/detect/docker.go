@@ -1,7 +1,9 @@
 package detect
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/allenbiji/clone-sage/internal/model"
@@ -59,6 +61,7 @@ func detectDockerCompose() []model.CheckConfig{
 
 	var parsed composeConfig
 	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		fmt.Fprintf(os.Stderr, "warn: could not parse %s: %v\n", targetFile, err)
 		return checks
 	}
 
@@ -68,6 +71,9 @@ func detectDockerCompose() []model.CheckConfig{
 
 			if hostPort == "" {
 				continue
+			}
+			if _, err := strconv.Atoi(hostPort); err != nil {
+				continue // non-numeric (env var reference, named port) — skip
 			}
 
 			checks = append(checks, model.CheckConfig{

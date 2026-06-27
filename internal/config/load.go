@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 
 	"github.com/allenbiji/clone-sage/internal/model"
@@ -13,19 +15,19 @@ func Load() (*model.ClonesageConfig, error) {
 
 	explicitCfg, errExplicit := readConfigFile("sage.yml")
 
-	if os.IsNotExist(errAuto) && os.IsNotExist(errExplicit) {
+	if errors.Is(errAuto, fs.ErrNotExist) && errors.Is(errExplicit, fs.ErrNotExist) {
 		return nil, fmt.Errorf("No config files found. Run 'sage init' to generate config files")
 	}
 
 	var finalCfg *model.ClonesageConfig
 	if explicitCfg == nil {
-		fmt.Println("Using auto-generated config (no sage.yml found).")
+		fmt.Fprintln(os.Stderr, "Using auto-generated config (no sage.yml found).")
 		finalCfg = autoCfg
 	} else if autoCfg == nil {
-		fmt.Println("Using explicit config (no sage-auto.yml found).")
+		fmt.Fprintln(os.Stderr, "Using explicit config (no sage-auto.yml found).")
 		finalCfg = explicitCfg
 	} else {
-		fmt.Println("Merging sage-auto.yml with sage.yml...")
+		fmt.Fprintln(os.Stderr, "Merging sage-auto.yml with sage.yml...")
 		finalCfg = mergeConfigs(autoCfg, explicitCfg)
 	}
 

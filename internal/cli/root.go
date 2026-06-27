@@ -1,17 +1,21 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"github.com/allenbiji/clone-sage/internal/engine"
 	"github.com/spf13/cobra"
 )
 
 func RootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "sage",
-		Short: "Clonesage handles local setup diagnostics",
-		Long:  "An open-source CLI for diagnosing local development setup failures in repositories.",
+		Use:           "sage",
+		Short:         "Clonesage handles local setup diagnostics",
+		Long:          "An open-source CLI for diagnosing local development setup failures in repositories.",
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			printBanner()
 		},
@@ -25,8 +29,13 @@ func RootCmd() *cobra.Command {
 }
 
 func Execute() {
-	if err := RootCmd().Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	err := RootCmd().Execute()
+	if err == nil {
+		return
+	}
+	if errors.Is(err, engine.ErrCheckFailed) {
 		os.Exit(1)
 	}
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(2)
 }

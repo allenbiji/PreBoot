@@ -1,6 +1,8 @@
 package detect
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/allenbiji/clone-sage/internal/model"
@@ -18,7 +20,11 @@ func generateEnvChecks(fileName string) []model.CheckConfig {
 		Fix:      "Run cp " + fileName + " .env",
 	})
 
-	keys, _ := ExtractEnvKeys(fileName)
+	keys, err := ExtractEnvKeys(fileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "warn: could not read %s: %v\n", fileName, err)
+		return checks
+	}
 
 	for key := range keys {
 		checks = append(checks, model.CheckConfig{

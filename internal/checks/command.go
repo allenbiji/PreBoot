@@ -3,6 +3,7 @@ package checks
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/allenbiji/clone-sage/internal/model"
 	"github.com/allenbiji/clone-sage/internal/registry"
@@ -26,7 +27,10 @@ func (c *CommandCheck) Execute() error {
 func buildCommandExistsCheck(cfg model.CheckConfig) (registry.Check, error){
 	cmd, ok := cfg.Options["command"]
 	if !ok || cmd == "" {
-		return nil, fmt.Errorf("command_exists check requires a 'Command' option")	
+		return nil, fmt.Errorf("command_exists check requires a 'Command' option")
+	}
+	if strings.ContainsAny(cmd, "/\\") {
+		return nil, fmt.Errorf("command_exists command %q must be a bare name, not a path", cmd)
 	}
 
 	return &CommandCheck{

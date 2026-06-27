@@ -3,6 +3,7 @@ package checks
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/allenbiji/clone-sage/internal/model"
 	"github.com/allenbiji/clone-sage/internal/registry"
@@ -32,9 +33,11 @@ func buildDirectoryExistsCheck(cfg model.CheckConfig) (registry.Check, error){
 	if !ok || folder == "" {
 		return nil, fmt.Errorf("directory_exists check requires a 'folder' option")
 	}
-    
+	if err := validateRelativePath(folder, "folder"); err != nil {
+		return nil, err
+	}
 	return &DirectoryCheck{
-		Folder: folder,
+		Folder: filepath.Clean(folder),
 	}, nil
 }
 

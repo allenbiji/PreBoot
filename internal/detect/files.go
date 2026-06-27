@@ -22,7 +22,7 @@ func ExtractEnvKeys(filePath string) (map[string]string, error) {
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("The file could not be opened")
+		return nil, fmt.Errorf("could not open %s: %w", filePath, err)
 	}
 
 	defer file.Close()
@@ -47,7 +47,7 @@ func ExtractEnvKeys(filePath string) (map[string]string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Error reading file", err)
+		return nil, fmt.Errorf("error reading %s: %w", filePath, err)
 	}
 
 	return envMap, nil
