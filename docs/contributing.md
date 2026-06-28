@@ -14,9 +14,7 @@
 ```bash
 git clone https://github.com/allenbiji/preboot.git
 cd preboot
-
-# Build the binary
-go build ./cmd/preboot
+make build
 
 # Run it
 ./preboot --help
@@ -25,20 +23,17 @@ go build ./cmd/preboot
 ### Run tests
 
 ```bash
-# All tests with race detector (matches CI)
-go test ./... -race -count=1
+make test          # all tests with race detector (matches CI)
 
-# Specific package
+# Specific package or single test (raw go for targeting)
 go test ./internal/checks/... -v
-
-# Single test
 go test ./internal/config/... -run TestLoad_BothFiles -v
 ```
 
 ### Vet and lint
 
 ```bash
-go vet ./...
+make vet
 ```
 
 There is no linter configuration in the repo beyond the standard `go vet`. If you add one (e.g. `golangci-lint`), document it here.
@@ -47,9 +42,9 @@ There is no linter configuration in the repo beyond the standard `go vet`. If yo
 
 ## Project conventions
 
-### No Makefile (yet)
+### Makefile
 
-All commands are raw `go` invocations. See `go help` for the full command reference.
+Run `make help` to see all available targets. Use `make ci` before pushing to run the full build + vet + test chain locally.
 
 ### Test patterns
 
@@ -198,8 +193,7 @@ Add a section to [docs/checks.md](checks.md) documenting the new type's options,
 ### 7. Run tests
 
 ```bash
-go test ./... -race -count=1
-go vet ./...
+make ci
 ```
 
 ---
@@ -230,10 +224,10 @@ All three steps must pass. PRs that break the build, introduce vet warnings, or 
 go get github.com/some/package@v1.2.3
 
 # Remove unused dependencies
-go mod tidy
+make tidy
 
 # Verify the module graph
-go mod verify
+make verify
 ```
 
 Commit both `go.mod` and `go.sum` with every dependency change.
@@ -256,9 +250,7 @@ refactor: extract timeout resolution into helper
 
 ## Pull request checklist
 
-- [ ] `go build ./...` passes
-- [ ] `go vet ./...` passes
-- [ ] `go test ./... -race -count=1` passes
+- [ ] `make ci` passes (build + vet + test)
 - [ ] New public functions/types have a one-line doc comment
 - [ ] New check types are documented in `docs/checks.md`
 - [ ] `go.mod` and `go.sum` are up to date

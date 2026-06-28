@@ -20,8 +20,11 @@ No runtime dependencies — the compiled binary is statically linked and self-co
 git clone https://github.com/allenbiji/preboot.git
 cd preboot
 
-# Build and place the binary on your PATH
-go build -o /usr/local/bin/preboot ./cmd/preboot
+# Build the binary
+make build
+
+# (Optional) place it on your PATH
+sudo mv preboot /usr/local/bin/preboot
 
 # Verify
 preboot --version

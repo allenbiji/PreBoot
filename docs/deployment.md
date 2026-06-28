@@ -335,10 +335,8 @@ docker push ghcr.io/allenbiji/preboot:v0.2.0
 Before shipping a release, make sure all of the following pass:
 
 ```
-go build ./...           ← binary compiles
-go vet ./...             ← no vet warnings
-go test ./... -race -count=1  ← all tests pass
-goreleaser check         ← GoReleaser config is valid
+make ci              ← build + vet + test
+goreleaser check     ← GoReleaser config is valid
 ```
 
 Add these as a pre-release gate in GitHub Actions by running them in the existing `ci.yml` and making the `release.yml` job depend on `ci.yml` passing first:
@@ -370,7 +368,7 @@ The YAML schema is currently `version: 1`. Increment it if you make breaking cha
 ## Summary: deployment sequence
 
 ```
-1. go test ./... -race     ← tests pass
+1. make ci                 ← tests pass
 2. git tag v0.X.Y          ← create version tag
 3. git push origin vX.X.Y  ← triggers release.yml
 4. GoReleaser:
